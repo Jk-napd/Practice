@@ -41,7 +41,7 @@ const int dy[] = {0, 0, 1, -1};
 
 
 
-//Simple dfs call with Adjacency List
+// Simple dfs call with Adjacency List
 void dfs(vector<vector<int>>& g, vector<bool>& vis, int u) {
 
     cout<<u<<" ";
@@ -53,20 +53,20 @@ void dfs(vector<vector<int>>& g, vector<bool>& vis, int u) {
 }
 
 
-//Checks cycle in Undirected Graph using DFS
+// Checks cycle in Undirected Graph using DFS
 bool cycleInUndirectedGraphDFS(vector<vector<int>>& g, vector<bool>& vis, int u, int par) {
 
     vis[u] = true;
 
     for(auto &child : g[u]) {
-        //If child is not visited then we go and check in the 
-        //following child and see if there is any cycle in the subtree ? 
+        // If child is not visited then we go and check in the 
+        // following child and see if there is any cycle in the subtree ? 
         if(!vis[child]) {
             if(cycleInUndirectedGraphDFS(g, vis, child, u)) return true;
         }
         else if(child != par) return true;
-        //Visited node must be equal to parent node otherwise it can be visited
-        //only if there is a cycle
+        // Visited node must be equal to parent node otherwise it can be visited
+        // only if there is a cycle
     }
     return false;
 }
@@ -74,16 +74,16 @@ bool cycleInUndirectedGraphDFS(vector<vector<int>>& g, vector<bool>& vis, int u,
 
 bool cycleInDirectedGraphDFS(vector<vector<int>>& g, vector<int>& vis, int u) {
 
-    //Marking the current node as visited
+    // Marking the current node as visited
     vis[u] = 1;
 
-    bool ans = false;//Store the answer of every callable DFS calls
+    bool ans = false;// Store the answer of every callable DFS calls
     for(auto &child : g[u]) {
 
-        //If Child is already visited in the path that means there exist a cycle
+        // If Child is already visited in the path that means there exist a cycle
         if(vis[child] == 1) return true;
 
-        //Store the answer of all the remaining arrangement of the subtrees
+        // Store the answer of all the remaining arrangement of the subtrees
         ans |= cycleInDirectedGraphDFS(g, vis, child);
     }
     return ans;
@@ -91,10 +91,10 @@ bool cycleInDirectedGraphDFS(vector<vector<int>>& g, vector<int>& vis, int u) {
 
 void topoSortDFS(vector<vector<int>>& g, vector<int>& vis, int u, vector<int>& order) {
 
-    //Marking the current node as visited
+    // Marking the current node as visited
     vis[u] = 1;
 
-    //Simple DFS calls
+    // Simple DFS calls
     for(auto &child : g[u]) {
         if(!vis[child]) topoSortDFS(g, vis, child, order);
     }
@@ -103,10 +103,10 @@ void topoSortDFS(vector<vector<int>>& g, vector<int>& vis, int u, vector<int>& o
 
 void bfs(vector<vector<int>>& g, int u) {
 
-    int n = g.size(); //Total no of nodes;
+    int n = g.size(); // Total no of nodes;
     vector<bool> vis(n, false);
     queue<int> q;
-    q.push(u); //Node from where we will start BFS
+    q.push(u); // Node from where we will start BFS
     vis[u] = true;
 
     while(!q.empty()) {
@@ -211,6 +211,34 @@ void dfsOnGrid(vector<vector<int>> &g, int x, int y) {
             dfsOnGrid(g, nx, ny);
     }
 }
+
+
+
+// DSU
+
+
+// Find / Get function
+// Path compression technique is used here
+// O(log*n) complexity
+// Here we are just finding the parent and then while coming back
+// we are updating the parent for the current node 
+int Get(vector<int> &parent, int a) {
+
+    return parent[a] = parent[a] == a ? a : Get(parent, parent[a]);
+}
+
+
+// Union by rank
+void Union(vector<int> & parent, vecor<int> &rank, int a, int b) {
+
+    a = Get(parent, a);
+    b = Get(parent, b);
+    if(a == b) return; // No need to merge the same components again || CYCLE !!!!
+    if(rank[a] < rank[b]) swap(a, b); 
+    parent[b] = a; // Updating the parent of other component
+    rank[a] += rank[b]; // Updating the size of component's parent
+}
+
 
 signed main() {
     int t = 1;
