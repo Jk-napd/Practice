@@ -89,7 +89,7 @@ bool cycleInDirectedGraphDFS(vector<vector<int>>& g, vector<int>& vis, int u) {
     return ans;
 }
 
-void topoSortDFS(vector<vector<int>>& g, vector<int>& vis, int u, vector<int>& order) {
+void topoSortDFS(vector<vector<int>>& g, vector<bool>& vis, int u, vector<int>& order) {
 
     // Marking the current node as visited
     vis[u] = 1;
@@ -98,7 +98,23 @@ void topoSortDFS(vector<vector<int>>& g, vector<int>& vis, int u, vector<int>& o
     for(auto &child : g[u]) {
         if(!vis[child]) topoSortDFS(g, vis, child, order);
     }
+
+    // We can store the same result either in vector or stack
     order.emplace_back(u);
+}
+
+void topoSortDFS(vector<vector<int>>& g, vector<bool>& vis, int u, stack<int>& order) {
+
+    // Marking the current node as visited
+    vis[u] = 1;
+
+    // Simple DFS calls
+    for(auto &child : g[u]) {
+        if(!vis[child]) topoSortDFS(g, vis, child, order);
+    }
+
+    // We can store the same result either in vector or stack
+    order.push(u);
 }
 
 void bfs(vector<vector<int>>& g, int u) {
@@ -184,6 +200,83 @@ vector<int> khanAlgo(vector<vector<int>>& g, vector<int>& indegree) {
 
     reverse(ans.begin(), ans.end());
     return ans;
+}
+
+void kosarajuAlgo(vector<vector<int>> &g) {
+
+    // Can be used to get total no of strongly connected components
+
+    int n = g.size();
+
+    vector<bool> vis(n, false);
+    stack<int> topoNodes;
+
+    for(int i = 0; i < n; ++i) {
+        if(!vis[i]) {
+            topoSortDFS(g, vis, i, topoNodes);
+        }
+    }
+
+    // Now reverse the Graph
+
+    vector<vector<int>> newGraph(n);
+    for(int i = 0; i < n; ++i) {
+        vis[i] = false;
+        for(int j = 0; j < g[i].size(); ++j) {
+            newGraph[g[i][j]].emplace_back(i);
+        }
+    }
+
+    int scc = 0;
+    while(!topoNodes.empty()) {
+        int u = topoNodes.top();
+        topoNodes.pop();
+        if(vis[u] == false) {
+
+            scc++;
+            dfs(newGraph, vis, u);
+        }
+    }
+
+    cout << scc << endl;
+    return;
+}
+
+
+
+void bellmanFord(vector<vector<int>> &edgeList, int n) {
+
+    vector<int> dist(n, INT_MAX);
+
+    // Remember when we are calculating min distance from the node
+    // It all works in addition not multiplaction or exponential
+    // for that type of things we have to break the problem in such a way
+    // that it uses addition for calculating min dist
+    // Or change the approach.
+
+
+    bool ok = false;
+
+    // We are relaxing the edge for n - 1 times
+    // In the nth relaxation if relaxation is happens than we 
+    // know that we have a cycle.
+    for(int i = 0; i < n; ++i) {
+        for(auto &edge : edgeList) {
+
+            int a = edge[0];
+            int b = edge[1];
+            int w = edge[2];
+
+            if(dist[a] != INT_MAX && dist[a] + w < dist[b]) {
+                if(i == n - 1) ok = true;
+                dist[b] = dist[a] + w;
+            }
+        }
+    }
+
+    if(ok) cout << "Negative Cycle";
+
+    return;
 }
 
 void dfsOnGrid(vector<vector<int>> &g, vector<vector<bool>> &vis, int x, int y) {
